@@ -15,9 +15,10 @@
     <div id="xapp">
       <div>
         <h1>Register new user</h1>
-        <form action="">
+        Register token: @Model.RegisterToken
+        <form v-on:submit.prevent="submit" href="#">
             <input type="text" placeholder="Email"/>
-            <button @@click="register">Register</button>
+            <button>Register</button>
         </form>
       </div>
     </div>
@@ -40,17 +41,18 @@
         setup() {
           
           const p = new Passwordless.Client({
-            
+            apiUrl: "@passwordlessOptions.Value.ApiUrl",
+            apiKey: "@passwordlessOptions.Value.ApiKey"
           });
 
-          const register = () => {
-            // todo: get token
-            p.register();
+          const submit = () => {
+            console.log("Hello");
+            p.register("@Model.RegisterToken");
           }
 
           return {
             
-            register
+            submit
           }
         }
       }).mount('#xapp')

@@ -4,10 +4,8 @@
 builder.Services.AddRazorPages();
 
 builder.Services.Configure<PasswordlessOptions>(builder.Configuration.GetSection("Passwordless"));
-builder.Host.ConfigureAppConfiguration((cfg, config) => {
-    config.AddJsonFile("appsettings.Development2.json", optional: false, reloadOnChange: true);
-});
-
+builder.Services.AddScoped<PasswordlessApi>();
+builder.Services.AddHttpClient();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
