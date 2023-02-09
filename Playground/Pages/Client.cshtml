@@ -1,0 +1,58 @@
+﻿@page "/client"
+@model ClientModel
+@inject Microsoft.Extensions.Options.IOptionsSnapshot<PasswordlessOptions> passwordlessOptions
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Client</h1>
+    <p>
+        Alright lets go passwordless
+        @passwordlessOptions.Value.ApiUrl
+    </p>
+
+    <div id="xapp">
+      <div>
+        <h1>Register new user</h1>
+        <form action="">
+            <input type="text" placeholder="Email"/>
+            <button @@click="register">Register</button>
+        </form>
+      </div>
+    </div>
+</div>
+
+
+
+<script src="https://cdn.passwordless.dev/dist/0.4.0/passwordless.iife.js"></script>
+
+<script>
+    @* var p = new Passwordless.Client();
+    p.register(); *@
+</script>
+
+
+@section Scripts {
+    <script type="module">
+        import { createApp,ref } from 'vue';
+       createApp({
+        setup() {
+          
+          const p = new Passwordless.Client({
+            
+          });
+
+          const register = () => {
+            // todo: get token
+            p.register();
+          }
+
+          return {
+            
+            register
+          }
+        }
+      }).mount('#xapp')
+    </script>
+}
