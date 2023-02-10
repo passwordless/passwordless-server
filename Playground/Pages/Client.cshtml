@@ -1,62 +1,128 @@
 ﻿@page "/client"
 @model ClientModel
 @inject Microsoft.Extensions.Options.IOptionsSnapshot<PasswordlessOptions> passwordlessOptions
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
 @{
-    ViewData["Title"] = "Home page";
+  ViewData["Title"] = "Home page";
+  var requestToken = Antiforgery.GetAndStoreTokens(Model.HttpContext).RequestToken;
 }
 
 <div class="text-center">
-    <h1 class="display-4">Client</h1>
-    <p>
-        Alright lets go passwordless
-        @passwordlessOptions.Value.ApiUrl
-        <br />
-        @passwordlessOptions.Value.ApiKey
-    </p>
+  <h1 class="display-4">Client</h1>
+  <p>
+    Alright lets go passwordless
+    @passwordlessOptions.Value.ApiUrl
+    <br />
+    @passwordlessOptions.Value.ApiKey
+  </p>
 
-    <div id="xapp">
+  <div id="xapp">
+    <div>
+      <h1>Register new user</h1>
+      Register token: @Model.RegisterToken
+      <form v-on:submit.prevent="submit" href="#">
+        <input type="text" placeholder="Email" />
+        <button>Register</button>
+      </form>
+    </div>
+
+    <div>
+      <h1>Login</h1>
+      <form v-on:submit.prevent="loginSubmit" href="#" name="signin" method="post">
+        <input type="text" placeholder="Alias" name="alias" />
+        <button type="submit">Login</button>
+      </form>
+
+      List of Signins:
       <div>
-        <h1>Register new user</h1>
-        Register token: @Model.RegisterToken
-        <form v-on:submit.prevent="submit" href="#">
-            <input type="text" placeholder="Email"/>
-            <button>Register</button>
-        </form>
+        <div v-for="item in signins" class="signin-item">
+          <span v-for="(value, name) in item" class="item-pair">
+            <strong>{{name}}: </strong>{{value}}
+          </span>
+        </div>
       </div>
     </div>
+  </div>
 </div>
 
+<style>
+  .signin-item {
+    padding: 10px;
+    display: flex;
+    background-color: #eee;
+    border-radius: 5px;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .item-pair {
+    padding: 5px;
+    background: #c2d5dd;
+    border-radius: 3px;
+  }
+</style>
 
 
 <script src="https://cdn.passwordless.dev/dist/0.4.0/passwordless.iife.js"></script>
 
 <script>
-    @* var p = new Passwordless.Client();
+  @* var p = new Passwordless.Client();
     p.register(); *@
 </script>
 
 
 @section Scripts {
-    <script type="module">
-        import { createApp,ref } from 'vue';
-       createApp({
-        setup() {
-          
-          const p = new Passwordless.Client({
-            apiUrl: "@passwordlessOptions.Value.ApiUrl",
-            apiKey: "@passwordlessOptions.Value.ApiKey"
-          });
+  <script type="module">
+      import { createApp, ref } from 'vue';
+    createApp({
+      setup() {
 
-          const submit = () => {
-            console.log("Hello");
-            p.register("@Model.RegisterToken");
-          }
+        const p = new Passwordless.Client({
+          apiUrl: "@passwordlessOptions.Value.ApiUrl",
+          apiKey: "@passwordlessOptions.Value.ApiKey"
+        });
 
-          return {
-            
-            submit
-          }
+        const submit = () => {
+          console.log("Hello");
+          p.register("@Model.RegisterToken");
         }
-      }).mount('#xapp')
-    </script>
+
+        const signins = ref([]);
+        const loginSubmit = async (e) => {
+          console.log("Login", e, e.target.alias.value);
+          var verify_token = await p.signinWithAlias()
+
+          var result = await verifyWithBackend(verify_token);
+          signins.value.push(result);
+
+          console.log(signins.value);
+        }
+
+        return {
+          loginSubmit,
+          submit,
+          signins
+        }
+      }
+    }).mount('#xapp');
+
+    async function verifyWithBackend(token) {
+      console.warn("TOKEN", token);
+
+      var res = await fetch("", {
+        method: "POST",
+        body: new URLSearchParams({ token }),
+        headers: {
+          RequestVerificationToken: "@requestToken"
+        }
+      });
+      console.log("Result from post", res)
+
+      if (res.ok) {
+        return await res.json();
+      }
+      return res;
+    }
+  </script>
 }

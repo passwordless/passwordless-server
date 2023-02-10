@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Playground.Pages;
 
@@ -17,7 +18,13 @@ public class ClientModel : PageModel
 
     public async Task OnGet()
     {
-        RegisterToken = await api.CreateRegisterToken(new PasswordlessApi.RegisterOptions() { UserId = "123"});        
+        RegisterToken = await api.CreateRegisterToken(new PasswordlessApi.RegisterOptions() { UserId = "123" });
+    }
+
+    public async Task<IActionResult> OnPost(string token)
+    {
+        var res = await api.VerifyToken(token);
+        return new JsonResult(res);
     }
 }
 
