@@ -18,6 +18,7 @@ if (builder.Environment.IsDevelopment())
 builder.Services.AddScoped<ITenantProvider, TenantProvider>();
 builder.Services.AddSingleton<IDbTenantContextFactory, MultiTenantSqliteDbTenantContextFactory>();
 builder.Services.AddScoped<AccountService>();
+builder.Services.AddScoped<UserCredentialsService>();
 builder.Services.AddScoped<TestService>();
 builder.Services.AddScoped<IStorage>((sp) => {
     var factory = sp.GetRequiredService<IDbTenantContextFactory>();
@@ -52,6 +53,7 @@ app.MapRegisterEndpoints();
 app.MapAliasEndpoints();
 app.MapAccountEndpoints();
 app.MapCredentialsEndpoints();
+app.MapUsersEndpoints();
 app.MapHealthEndpoints();
 
 app.Run();

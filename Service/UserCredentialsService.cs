@@ -1,14 +1,22 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Service.Models;
 using Service.Storage;
+using Service.Helpers;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Service.Helpers
+namespace Service
 {
     public class UserCredentialsService
     {
         private readonly IStorage _storage;
+
+        public UserCredentialsService(IStorage storage)
+        {
+            _storage = storage;
+        }
 
         public UserCredentialsService(string tenant, IConfiguration config, IStorage storage)
         {
@@ -38,5 +46,15 @@ namespace Service.Helpers
             }
             await _storage.DeleteCredential(credentialId);
         }
+
+        public Task<List<UserSummary>> GetAllUsers() {
+            return Task.FromResult(new List<UserSummary>() {
+                new UserSummary() { UserId = "Anders123"}
+            });
+        }
+    }
+
+    public class UserSummary {
+        public string UserId { get; set; }
     }
 }

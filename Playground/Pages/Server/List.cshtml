@@ -1,0 +1,35 @@
+﻿@page "/server/list"
+@model ListModel
+@inject Microsoft.Extensions.Options.IOptionsSnapshot<PasswordlessOptions> passwordlessOptions
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
+@{
+  ViewData["Title"] = "Home page";
+  var requestToken = Antiforgery.GetAndStoreTokens(Model.HttpContext).RequestToken;
+}
+
+<div class="text-center">
+  <h1 class="display-4">Server</h1>
+  <div class="api-info">    
+    ApiUrl: @passwordlessOptions.Value.ApiUrl
+    <br />
+    ApiKey: @passwordlessOptions.Value.ApiKey
+  </p>
+
+  <div>
+    <h1>Credential list</h1>
+    <div>
+      Add API endpoint to list all credentials
+      Remove credentials
+      Register new credential as this user
+      Add API endpoint to see audit logs
+    </div>
+    <div>
+      @foreach (var user in Model.Users)
+      {
+        @user.UserId
+      }
+    </div>
+  </div>
+
+  </div>

@@ -38,6 +38,25 @@ public class PasswordlessApi
         }
     }
 
+    public async Task<List<PasswordlessUserSummary>> ListUsers()
+    {
+        using (var client = SecretClient)
+        {
+            var req = await client.GetAsync("users/list");
+
+            // todo: replace with better error handling
+            req.EnsureSuccessStatusCode();
+
+            if (req.IsSuccessStatusCode)
+            {
+                var res = await req.Content.ReadFromJsonAsync<List<PasswordlessUserSummary>>();
+                return res;
+            }
+
+            return null;
+        }
+    }
+
     public HttpClient SecretClient
     {
         get
@@ -51,6 +70,10 @@ public class PasswordlessApi
 
     public class RegisterOptions
     {
+        public string UserId { get; set; }
+    }
+
+    public class PasswordlessUserSummary {
         public string UserId { get; set; }
     }
 
