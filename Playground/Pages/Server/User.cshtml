@@ -1,0 +1,74 @@
+﻿@page "/server/user/{userid}"
+@model UserModel
+@inject Microsoft.Extensions.Options.IOptionsSnapshot<PasswordlessOptions> passwordlessOptions
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
+@{
+  ViewData["Title"] = "Home page";
+  var requestToken = Antiforgery.GetAndStoreTokens(Model.HttpContext).RequestToken;
+}
+
+<div class="text-centerc">
+  <h1 class="display-4">Server</h1>
+  <div class="api-info">    
+    ApiUrl: @passwordlessOptions.Value.ApiUrl
+    <br />
+    ApiKey: @passwordlessOptions.Value.ApiKey
+  </p>
+
+  <div>
+    <h1>User Details for #@Model.UserId</h1>
+    
+    <div class="credential-wrapper">      
+      @foreach (var cred in Model.Credentials)
+      {
+        <div class="credential">
+
+            <h2 class="text-center">@(cred.Nickname ?? @cred.Device)</h2>
+            <h6 class="text-center">@(cred.Nickname ?? "No nickname")</h6>
+
+            <div>
+            <span class="strong">UserId: </span><span>@cred.UserId</span><br/>            
+            <span class="strong">Created:</span><span>@cred.CreatedAt</span><br />
+            <span class="strong">Last used: </span><span>@cred.LastUsedAt</span>
+            </div>
+            <hr>
+            <div class="mt-3">
+              <h6>Details</h6>              
+            </div>
+
+            <div>
+                <span class="strong">Credential Id: </span><small class="font-monospace">@cred.Descriptor.Id.ToBase64Url()</small><br />
+                <div class="mt-2"></div>
+                <span class="strong">Public Key: </span><small class="text-break font-monospace">@cred.PublicKey.ToBase64Url()</small><br/>
+                <hr>
+                <span class="strong">Type: </span><small class="text-break font-monospace">@cred.CredType</small><br />
+                <span class="strong">Counter: </span><small class="text-break font-monospace">@cred.SignatureCounter</small><br />
+                <span class="strong">RPID: </span><small class="text-break font-monospace">@cred.RPID</small><br />
+                <span class="strong">Origin: </span><small class="text-break font-monospace">@cred.Origin</small><br />
+                <span class="strong">AaGuid: </span><small class="text-break font-monospace">@cred.AaGuid</small><br />
+
+            </div>
+            <button type="button" class="mt-3 btn btn-sm btn-danger">Remove</button>
+          </div>
+      }      
+    </div>
+    <ul>
+      <li>Add API endpoint to list all credentials</li>
+      <li>Remove credentials</li>
+      <li>Register new credential as this user</li>
+      <li>Add API endpoint to see audit logs</li>
+    </ul>
+  </div>
+<style>
+  .credential-wrapper {
+    display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .credential {
+    background: #eee;
+    padding: 15px;
+    border-radius: 6px;
+  }
+</style>

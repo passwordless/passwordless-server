@@ -18,7 +18,7 @@ public static class UsersEndpoints
                 // todo: Add Include Aliases
                 var accountname = await accountService.ValidateSecretApiKey(req.GetApiSecret());
 
-                var result = await userService.GetAllUsers();
+                var result = await userService.GetAllUsers(null);
 
                 app.Logger.LogInformation("event=users/list account={0}", accountname);
 

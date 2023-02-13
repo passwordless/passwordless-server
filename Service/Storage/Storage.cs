@@ -434,5 +434,10 @@ namespace Service.Storage
 
             return insertOrReplace;
         }
+
+        public Task<List<UserSummary>> GetUsers(string lastUserId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

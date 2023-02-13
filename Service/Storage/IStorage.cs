@@ -28,5 +28,6 @@ namespace Service.Storage
         Task StoreApiKey(string pkpart, string apikey, string[] scopes);
         Task<bool> TenantExists();
         Task UpdateCredential(byte[] credentialId, uint counter, string country, string device);
+        Task<List<UserSummary>> GetUsers(string lastUserId);
     }
 }

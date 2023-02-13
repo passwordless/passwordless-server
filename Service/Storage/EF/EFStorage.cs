@@ -8,6 +8,7 @@ using Fido2NetLib.Objects;
 using Microsoft.EntityFrameworkCore;
 using Service.Models;
 using Service.Storage;
+using Service;
 
 public class EFStorage : IStorage
 {
@@ -156,5 +157,22 @@ public class EFStorage : IStorage
         c.Device = device;
         db.Credentials.Update(c);
         await db.SaveChangesAsync();
+    }
+
+    public async Task<List<UserSummary>> GetUsers(string lastUserId) {
+        // TODO: Support mor information by counting credentials etc.
+        var res = await db
+            .Credentials            
+            .Select(c => c.UserId)
+            .Distinct()
+            .OrderBy(c => c)
+            //.Where(c => lastUserId != null && String.Compare(c,lastUserId) >= 0)
+            .Take(100)            
+            .Select(c => new UserSummary { UserId = c})
+            .AsNoTracking()
+            .ToListAsync();      
+
+        return res;
+            
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Fido2NetLib;
 using Fido2NetLib.Objects;
+using Service;
 using Service.Models;
 using Service.Storage;
 
@@ -69,6 +70,11 @@ public class NoOpStorage : IStorage
     }
 
     public Task<string> GetUserIdByAliasAsync(string alias)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<List<UserSummary>> GetUsers(string lastUserId)
     {
         throw new NotImplementedException();
     }

@@ -8,28 +8,37 @@
   var requestToken = Antiforgery.GetAndStoreTokens(Model.HttpContext).RequestToken;
 }
 
-<div class="text-center">
+<div>
   <h1 class="display-4">Server</h1>
-  <div class="api-info">    
+  <div class="api-info">
     ApiUrl: @passwordlessOptions.Value.ApiUrl
     <br />
     ApiKey: @passwordlessOptions.Value.ApiKey
-  </p>
+    </p>
+  </div>
 
   <div>
-    <h1>Credential list</h1>
+    <h1>Users</h1>
     <div>
-      Add API endpoint to list all credentials
-      Remove credentials
-      Register new credential as this user
-      Add API endpoint to see audit logs
-    </div>
-    <div>
-      @foreach (var user in Model.Users)
-      {
-        @user.UserId
-      }
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">User Id</th>
+            <th scope="col">Aliases</th>
+            <th scope="col">Credentials count</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach (var user in Model.Users)
+          {
+            <tr>
+              <th scope="row"><a asp-page="/server/user" asp-route-userid="@user.UserId">@user.UserId</a></th>
+              <td>Encrypted</td>
+              <td>1</td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
   </div>
-
-  </div>
+</div>

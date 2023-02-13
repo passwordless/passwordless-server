@@ -47,10 +47,8 @@ namespace Service
             await _storage.DeleteCredential(credentialId);
         }
 
-        public Task<List<UserSummary>> GetAllUsers() {
-            return Task.FromResult(new List<UserSummary>() {
-                new UserSummary() { UserId = "Anders123"}
-            });
+        public Task<List<UserSummary>> GetAllUsers(string paginationLastId) {
+            return _storage.GetUsers(paginationLastId);
         }
     }
 
