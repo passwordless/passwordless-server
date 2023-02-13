@@ -79,6 +79,23 @@ public class PasswordlessApi
         }
     }
 
+    public async Task DeleteCredential(string id)
+    {
+        using(var client = SecretClient) {
+            var req = await client.PostAsJsonAsync("credentials/delete",new { CredentialId = id});
+
+            req.EnsureSuccessStatusCode();
+        }        
+    }
+
+    public async Task DeleteCredential(byte[] id)
+    {
+        using(var client = SecretClient) {
+            var req = await client.PostAsJsonAsync("credentials/delete",new { CredentialId = Base64Url.Encode(id)});
+            req.EnsureSuccessStatusCode();
+        }
+    }
+
     public HttpClient SecretClient
     {
         get
@@ -112,6 +129,13 @@ public class PasswordlessApi
         public string Country { get; set; }
         public string Nickname { get; set; }
         public DateTime ExpiresAt { get; set; }
+    }
+
+    public class AuditLog {
+        public DateTime Timestamp { get; set; }
+        public string Level { get; set; }
+        public string Message { get; set; }
+        public string Details { get; set; }
     }
 
     public class Credential
