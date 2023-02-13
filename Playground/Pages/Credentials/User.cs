@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Playground.Pages;
+namespace Playground.Pages.Credentials;
 
 public class UserModel : PageModel
 {

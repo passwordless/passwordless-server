@@ -41,7 +41,7 @@ public class CredentialDeleteModel : PageModel
     {
         await api.DeleteCredential(CredentialId);
 
-        return RedirectToPage("/server/user", null, new { UserId = UserId });
+        return RedirectToPage("/credentials/user", null, new { UserId = UserId });
     }
 }
 
