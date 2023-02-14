@@ -1,4 +1,4 @@
-﻿@page "/client"
+﻿@page "/playground"
 @model ClientModel
 @inject Microsoft.Extensions.Options.IOptionsSnapshot<PasswordlessOptions> passwordlessOptions
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
@@ -12,6 +12,8 @@
   <h1 class="display-4">Playground</h1>
   <p>
     Alright lets go passwordless
+
+    <a asp-page="newAccount">Create account</a>
   </p>
 
   <div id="xapp">

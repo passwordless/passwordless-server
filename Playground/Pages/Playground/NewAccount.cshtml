@@ -1,0 +1,141 @@
+@page "/playground/new-account"
+@model NewAccountModel
+@inject Microsoft.Extensions.Options.IOptionsSnapshot<PasswordlessOptions> passwordlessOptions
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
+@{
+    ViewData["Title"] = "Home page";
+    var requestToken = Antiforgery.GetAndStoreTokens(Model.HttpContext).RequestToken;
+}
+
+
+<div id="xapp">
+    <div>
+        <h1>Register new user</h1>
+        <form v-on:submit.prevent="createNewAccount">
+            <div class="form-floating mb-3">
+                <input type="text" name="name" id="name" class="form-control" placeholder="John Doe">
+                <label for="name">Your name</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" id="email" name="email" class="form-control" placeholder="john@example.com">
+                <label for="email">Your email</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" name="nickname" id="nickname" class="form-control" placeholder="john@example.com">
+                <label for="nickname">Optional - your name for this device</label>
+            </div>
+            <button class="btn btn-primary">Register</button>
+        </form>
+    </div>
+
+    @* <div>
+        <h1>Login</h1>
+        <form v-on:submit.prevent="loginSubmit" href="#" name="signin" method="post">
+        <input type="text" placeholder="Alias" name="alias" />
+        <button type="submit">Login</button>
+        </form>
+
+        List of Signins:
+        <div>
+        <div v-for="item in signins" class="signin-item">
+        <span v-for="(value, name) in item" class="item-pair">
+        <strong>{{name}}: </strong>{{value}}
+        </span>
+        </div>
+        </div>
+        </div> *@
+</div>
+
+
+<style>
+    .signin-item {
+        padding: 10px;
+        display: flex;
+        background-color: #eee;
+        border-radius: 5px;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+
+    .item-pair {
+        padding: 5px;
+        background: #c2d5dd;
+        border-radius: 3px;
+    }
+</style>
+
+
+<script src="https://cdn.passwordless.dev/dist/0.4.0/passwordless.iife.js"></script>
+
+@section Scripts {
+<script type="module">
+    import { createApp, ref } from 'vue';
+    createApp({
+        setup() {
+
+            const p = new Passwordless.Client({
+                apiUrl: "@passwordlessOptions.Value.ApiUrl",
+                apiKey: "@passwordlessOptions.Value.ApiKey"
+            });
+
+            const createNewAccount = async (e) => {
+                console.log("Create new account", e);
+                const data = new FormData(e.target);
+                console.log("DATA", data.entries());
+                var req = await fetch("?handler=token", {
+                    method: "post",
+                    body: data,
+                    headers: {
+                        RequestVerificationToken: "@requestToken"
+                    }
+                });
+
+                if (req.ok) {
+                    const token = await req.json();
+
+                    const nicknameForDevice = data.get("nickname");
+                    console.log("token nickname", nicknameForDevice);
+                    await p.register(token, nicknameForDevice);
+                }
+            }
+
+            const signins = ref([]);
+            const loginSubmit = async (e) => {
+                console.log("Login", e, e.target.alias.value);
+                var verify_token = await p.signinWithAlias()
+
+                var result = await verifyWithBackend(verify_token);
+                signins.value.push(result);
+
+                console.log(signins.value);
+            }
+
+            return {
+                loginSubmit,
+                createNewAccount,
+                signins
+            }
+        }
+    }).mount('#xapp');
+
+    async function verifyWithBackend(token) {
+        console.warn("TOKEN", token);
+
+        var res = await fetch("", {
+            method: "POST",
+            body: new URLSearchParams({ token }),
+            headers: {
+                RequestVerificationToken: "@requestToken"
+            }
+        });
+        console.log("Result from post", res)
+
+        if (res.ok) {
+            return await res.json();
+        }
+        return res;
+    }
+</script>
+}

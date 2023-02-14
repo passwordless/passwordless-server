@@ -109,7 +109,13 @@ public class PasswordlessApi
 
     public class RegisterOptions
     {
-        public string UserId { get; set; }
+         public string UserId { get; set; }
+        public string DisplayName { get; set; }
+        public string Username { get; set; }
+        public string AttType { get; set; } = "None";
+        public string AuthType { get; set; } = "Platform";
+        public bool RequireResidentKey { get; set; } = false;
+        public string UserVerification { get; set; } = "Preferred";
     }
 
     public class PasswordlessUserSummary

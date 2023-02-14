@@ -23,7 +23,7 @@ public class UserModel : PageModel
 
     public async Task OnGet()
     {
-        Credentials = await api.ListCredentials("123");
+        Credentials = await api.ListCredentials(UserId);
         AuditLogs = new List<PasswordlessApi.AuditLog> {
             new () {Timestamp = DateTime.Now, Level = "info", Message = "Signed in using credential ahjeas-aiwu12-an27s-jnb4-287hn58" },
             new () {Timestamp = DateTime.Now, Level = "danger", Message = "Authentication failed because of invalid signature. CredentialId: ahjeas-aiwu12-an27s-jnb4-287hn58." },
