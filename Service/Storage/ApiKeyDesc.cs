@@ -4,7 +4,6 @@ namespace Service.Storage
 {
     public class ApiKeyDesc : PerTenant
     {
-        public string Tenant { get; set; }
         public string Id { get; set; }
         public string AccountName { get; set; }
         public string ApiKey { get; set; }

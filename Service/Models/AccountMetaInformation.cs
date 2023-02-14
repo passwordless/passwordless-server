@@ -5,7 +5,6 @@ namespace Service.Models
 {
     public class AccountMetaInformation : PerTenant
     {
-        public string Tenant { get; set; }
         public string SubscriptionTier { get; set; }
         public string[] AdminEmails { get; set; }
 
