@@ -8,44 +8,37 @@
   var requestToken = Antiforgery.GetAndStoreTokens(Model.HttpContext).RequestToken;
 }
 
+<div id="xapp">
+  <div>
+    <h1>Sign in</h1>
+    <p>Don't have an account? <a asp-page="newAccount">Create account</a></p>
+    <form v-on:submit.prevent="loginSubmit" href="#" name="signin" method="post">
+      <div class="form-floating mb-3">
+        <input type="text" style="max-width:350px" id="alias" name="alias" class="form-control"
+          placeholder="john@example.com" autocomplete="webauthn">
+        <label for="alias">Your email</label>
+        <button type="submit" class="btn btn-primary mt-3">Sign in</button>
+      </div>
 
-  <h1 class="display-4">Playground</h1>
-  <p>
-    Alright lets go passwordless
-
-    <a asp-page="newAccount">Create account</a>
-  </p>
-
-  <div id="xapp">
-    <div>
-      <h1>Register new user</h1>
-      Register token: @Model.RegisterToken
-      <form v-on:submit.prevent="submit" href="#">
-        <input type="text" placeholder="Email" />
-        <button>Register</button>
-      </form>
-    </div>
-
-    <div>
-      <h1>Login</h1>
-      <form v-on:submit.prevent="loginSubmit" href="#" name="signin" method="post">
-        <input type="text" placeholder="Alias" name="alias" />
-        <button type="submit">Login</button>
-      </form>
-
-      List of Signins:
-      <div>
-        <div v-for="item in signins" class="signin-item">
-          <span v-for="(value, name) in item" class="item-pair">
-            <strong>{{name}}: </strong>{{value}}
-          </span>
-        </div>
+    </form>
+    <div v-cloak>
+      <h6 v-if="signins.length > 0 " class="mt-4">Technical information</h6>
+      <p v-if="signins.length > 0 ">Successful sign ins</p>
+      <div v-for="item in signins" class="signin-item">
+        <span v-for="(value, name) in item" class="item-pair">
+          <strong>{{name}}: </strong>{{value}}
+        </span>
       </div>
     </div>
   </div>
+</div>
 
 
 <style>
+  [v-cloak] {
+    display: none;
+  }
+
   .signin-item {
     padding: 10px;
     display: flex;
@@ -67,61 +60,71 @@
 
 <script>
   @* var p = new Passwordless.Client();
-    p.register(); *@
+      p.register(); *@
 </script>
 
 
 @section Scripts {
-  <script type="module">
+<script type="module">
       import { createApp, ref } from 'vue';
-    createApp({
-      setup() {
+  createApp({
+    setup() {
 
-        const p = new Passwordless.Client({
-          apiUrl: "@passwordlessOptions.Value.ApiUrl",
-          apiKey: "@passwordlessOptions.Value.ApiKey"
-        });
-
-        const submit = () => {
-          console.log("Hello");
-          p.register("@Model.RegisterToken");
-        }
-
-        const signins = ref([]);
-        const loginSubmit = async (e) => {
-          console.log("Login", e, e.target.alias.value);
-          var verify_token = await p.signinWithAlias()
-
-          var result = await verifyWithBackend(verify_token);
-          signins.value.push(result);
-
-          console.log(signins.value);
-        }
-
-        return {
-          loginSubmit,
-          submit,
-          signins
-        }
-      }
-    }).mount('#xapp');
-
-    async function verifyWithBackend(token) {
-      console.warn("TOKEN", token);
-
-      var res = await fetch("", {
-        method: "POST",
-        body: new URLSearchParams({ token }),
-        headers: {
-          RequestVerificationToken: "@requestToken"
-        }
+      const p = new Passwordless.Client({
+        apiUrl: "@passwordlessOptions.Value.ApiUrl",
+        apiKey: "@passwordlessOptions.Value.ApiKey"
       });
-      console.log("Result from post", res)
 
-      if (res.ok) {
-        return await res.json();
+      const autoFill = async () => {
+        const verify_token = await p.signinWithAutofill();
+        await signin(verify_token);
+      };
+      autoFill();
+
+      const submit = () => {
+        console.log("Hello");
+        p.register("@Model.RegisterToken");
       }
-      return res;
+
+      const signins = ref([]);
+      const loginSubmit = async (e) => {
+        // on form submit
+        const alias = e.target.alias.value;
+        console.log("Login", e, e.target.alias.value);
+        var verify_token = await p.signinWithAlias(alias)
+        await signin(verify_token);
+      }
+
+      async function signin(verify_token) {
+        var result = await verifyWithBackend(verify_token);
+        signins.value.push(result);
+        console.log(signins.value);
+      }
+
+      return {
+        loginSubmit,
+        submit,
+        signins
+      }
     }
-  </script>
+  }).mount('#xapp');
+
+  async function verifyWithBackend(token) {
+    console.warn("TOKEN", token);
+
+    var res = await fetch("", {
+      method: "POST",
+      body: new URLSearchParams({ token }),
+      headers: {
+        RequestVerificationToken: "@requestToken"
+      }
+    });
+    console.log("Result from post", res)
+
+    if (res.ok) {
+      return await res.json();
+    }
+    return res;
+  }
+</script>
 }

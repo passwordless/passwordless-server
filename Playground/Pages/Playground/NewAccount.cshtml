@@ -10,8 +10,9 @@
 
 
 <div id="xapp">
-    <div>
+    <div class="form-width">
         <h1>Register new user</h1>
+        <p>Please use the form below to create your new account.</p>
         <form v-on:submit.prevent="createNewAccount">
             <div class="form-floating mb-3">
                 <input type="text" name="name" id="name" class="form-control" placeholder="John Doe">
@@ -24,28 +25,11 @@
 
             <div class="form-floating mb-3">
                 <input type="text" name="nickname" id="nickname" class="form-control" placeholder="john@example.com">
-                <label for="nickname">Optional - your name for this device</label>
+                <label for="nickname">Your name for this device (optional)</label>
             </div>
             <button class="btn btn-primary">Register</button>
         </form>
     </div>
-
-    @* <div>
-        <h1>Login</h1>
-        <form v-on:submit.prevent="loginSubmit" href="#" name="signin" method="post">
-        <input type="text" placeholder="Alias" name="alias" />
-        <button type="submit">Login</button>
-        </form>
-
-        List of Signins:
-        <div>
-        <div v-for="item in signins" class="signin-item">
-        <span v-for="(value, name) in item" class="item-pair">
-        <strong>{{name}}: </strong>{{value}}
-        </span>
-        </div>
-        </div>
-        </div> *@
 </div>
 
 

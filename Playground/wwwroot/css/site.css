@@ -24,3 +24,6 @@ html {
 body {
   margin-bottom: 60px;
 }
+.form-width {
+  max-width: 450px;
+}
