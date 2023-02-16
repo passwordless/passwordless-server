@@ -155,6 +155,7 @@ public class EFStorage : IStorage
         c.SignatureCounter = counter;
         c.Country = country;
         c.Device = device;
+        c.LastUsedAt = DateTime.UtcNow;
         db.Credentials.Update(c);
         await db.SaveChangesAsync();
     }
