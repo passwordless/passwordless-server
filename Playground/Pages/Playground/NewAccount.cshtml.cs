@@ -25,7 +25,9 @@ public class NewAccountModel : PageModel
         var token = await api.CreateRegisterToken(new PasswordlessApi.RegisterOptions() {
             UserId = userId,
             Username = email,
-            DisplayName = name
+            DisplayName = name,
+            Aliases = new HashSet<string>(1) { email },
+            AliasHashing = false
         });
 
         return new JsonResult(token);

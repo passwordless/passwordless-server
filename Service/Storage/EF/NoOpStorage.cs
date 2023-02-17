@@ -44,6 +44,11 @@ public class NoOpStorage : IStorage
         throw new NotImplementedException();
     }
 
+    public Task<List<AliasPointer>> GetAliasesByUserId(string userid)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<ApiKeyDesc> GetApiKeyAsync(string apiKey)
     {
         throw new NotImplementedException();
@@ -95,6 +100,11 @@ public class NoOpStorage : IStorage
     }
 
     public Task StoreAlias(byte[] userid, HashSet<string> aliases)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task StoreAlias(string userid, Dictionary<string, string> aliases)
     {
         throw new NotImplementedException();
     }

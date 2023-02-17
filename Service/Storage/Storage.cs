@@ -439,5 +439,15 @@ namespace Service.Storage
         {
             throw new NotImplementedException();
         }
+
+        public Task StoreAlias(string userid, Dictionary<string, string> aliases)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<AliasPointer>> GetAliasesByUserId(string userid)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

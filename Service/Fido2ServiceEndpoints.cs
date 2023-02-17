@@ -128,7 +128,8 @@ namespace Service
             var token = _tokenService.EncodeToken(tokenProps as RegisterToken, "register_");
             if (tokenProps.Aliases != null)
             {
-                await SetAlias(tokenProps.UserId, tokenProps.Aliases);
+                var aliasPayload = new AliasPayload() { Aliases = tokenProps.Aliases, UserId = tokenProps.UserId, Hashing = tokenProps.AliasHashing };
+                await SetAlias(aliasPayload);
             }
 
             return token;
@@ -227,7 +228,12 @@ namespace Service
                             // If we found credentials using legacy hashing, Migrate to new hashing scheme
                             string aliasUserIdBase64 = await _storage.GetUserIdByAliasAsync(legacyHashed);
                             var useridbytes = Convert.FromBase64String(aliasUserIdBase64);
-                            await _storage.StoreAlias(useridbytes, new Aliases(1) { hashedAlias });
+                            var str = Encoding.UTF8.GetString(useridbytes);
+                            await _storage.StoreAlias(str,
+                                new Dictionary<string, string>()
+                                {
+                                    {hashedAlias,null}
+                                });
                         }
                     }
                 }
@@ -330,23 +336,53 @@ namespace Service
             }
         }
 
-        public Task SetAlias(string userId, Aliases aliases)
+        //public Task SetAlias(string userId, Aliases aliases)
+        //{
+        //    ValidateUserId(userId);
+        //    return SetAlias(Encoding.UTF8.GetBytes(userId), aliases);
+        //}
+
+        //public async Task SetAlias(byte[] userId, Aliases aliases)
+        //{
+        //    if (userId == null || userId.Length == 0) { throw new ApiException("userId most not be null", 400); }
+        //    ValidateAliases(aliases, true);
+        //    var values = new Aliases(aliases.Count);
+        //    foreach (var alias in aliases)
+        //    {
+        //        values.Add(HashAlias(alias, _tenant));
+        //    }
+
+        //    await _storage.StoreAlias(userId, values);
+        //}
+
+        public Task<List<AliasPointer>> GetAliases(string userId)
         {
-            ValidateUserId(userId);
-            return SetAlias(Encoding.UTF8.GetBytes(userId), aliases);
+            return _storage.GetAliasesByUserId(userId);
         }
 
-        public async Task SetAlias(byte[] userId, Aliases aliases)
+        public async Task SetAlias(AliasPayload data)
         {
-            if (userId == null || userId.Length == 0) { throw new ApiException("userId most not be null", 400); }
-            ValidateAliases(aliases, true);
-            var values = new Aliases(aliases.Count);
-            foreach (var alias in aliases)
+            if(data.UserId.IsNullOrEmpty())
             {
-                values.Add(HashAlias(alias, _tenant));
+                throw new ApiException("userId most not be null", 400);
             }
 
-            await _storage.StoreAlias(userId, values);
+            ValidateAliases(data.Aliases);
+
+            var values = new Dictionary<string, string>();
+            foreach(var alias in data.Aliases)
+            {
+                string plaintext = null;
+                if(data.Hashing == false)
+                {
+                    plaintext = alias;
+                }
+                values.Add(HashAlias(alias, _tenant), plaintext);
+            }
+
+            await _storage.StoreAlias(data.UserId, values);
+
+
         }
 
         private void ValidateUserId(string userId)

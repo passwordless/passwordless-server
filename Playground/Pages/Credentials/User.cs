@@ -9,6 +9,7 @@ public class UserModel : PageModel
     private readonly PasswordlessApi api;
 
     public List<PasswordlessApi.Credential> Credentials { get; set; }
+    public List<PasswordlessApi.AliasPointer> Aliases { get; set; }
 
     public List<PasswordlessApi.AuditLog> AuditLogs { get; set; }
     
@@ -26,6 +27,7 @@ public class UserModel : PageModel
     public async Task OnGet()
     {
         Credentials = await api.ListCredentials(UserId);
+        Aliases = await api.ListAliases(UserId);
         // RegisterToken = await api.CreateRegisterToken(new PasswordlessApi.RegisterOptions {
         //     UserId = UserId,
         //     Username = username,

@@ -10,6 +10,8 @@ namespace Service.Models
     {
         [Key(10)]
         public HashSet<string> Aliases { get; set; }
+        [Key(11)]
+        public bool AliasHashing { get; set; }
 
     }
     [MessagePackObject]

@@ -90,10 +90,10 @@ public class SqliteDbTenantContextFactory : IDbTenantContextFactory
         var dbContext = new DbTenantContext(options, new ManualTenantProvider(accountName));
 
         //// While dev
-        //if (accountName != null)
-        //{
-        //    dbContext.Database.Migrate();
-        //}
+        if (accountName != null)
+        {
+            dbContext.Database.Migrate();
+        }
 
         return new EFStorage(dbContext);
     }

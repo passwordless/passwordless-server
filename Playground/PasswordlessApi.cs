@@ -4,8 +4,10 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
 
-public static class PasswordlessExtensions {
-    public static string ToBase64Url(this byte[] bytes) {
+public static class PasswordlessExtensions
+{
+    public static string ToBase64Url(this byte[] bytes)
+    {
         return PasswordlessApi.Base64Url.Encode(bytes);
     }
 }
@@ -67,7 +69,19 @@ public class PasswordlessApi
         }
     }
 
-    internal async Task<List<Credential>> ListCredentials(string userId)
+    public async Task<List<AliasPointer>> ListAliases(string userId)
+    {
+        using (var client = SecretClient)
+        {
+            var req = await client.GetAsync($"alias/list?userid={userId}");
+            req.EnsureSuccessStatusCode();
+
+            return await req.Content.ReadFromJsonAsync<List<AliasPointer>>();
+        }
+    }
+
+
+    public async Task<List<Credential>> ListCredentials(string userId)
     {
         using (var client = SecretClient)
         {
@@ -81,17 +95,19 @@ public class PasswordlessApi
 
     public async Task DeleteCredential(string id)
     {
-        using(var client = SecretClient) {
-            var req = await client.PostAsJsonAsync("credentials/delete",new { CredentialId = id});
+        using (var client = SecretClient)
+        {
+            var req = await client.PostAsJsonAsync("credentials/delete", new { CredentialId = id });
 
             req.EnsureSuccessStatusCode();
-        }        
+        }
     }
 
     public async Task DeleteCredential(byte[] id)
     {
-        using(var client = SecretClient) {
-            var req = await client.PostAsJsonAsync("credentials/delete",new { CredentialId = Base64Url.Encode(id)});
+        using (var client = SecretClient)
+        {
+            var req = await client.PostAsJsonAsync("credentials/delete", new { CredentialId = Base64Url.Encode(id) });
             req.EnsureSuccessStatusCode();
         }
     }
@@ -109,13 +125,16 @@ public class PasswordlessApi
 
     public class RegisterOptions
     {
-         public string UserId { get; set; }
+        public string UserId { get; set; }
         public string DisplayName { get; set; }
         public string Username { get; set; }
         public string AttType { get; set; } = "None";
         public string AuthType { get; set; } = "Platform";
         public bool RequireResidentKey { get; set; } = false;
         public string UserVerification { get; set; } = "Preferred";
+        public HashSet<string> Aliases { get; set; }
+        public bool AliasHashing { get; set; }
+
     }
 
     public class PasswordlessUserSummary
@@ -137,7 +156,8 @@ public class PasswordlessApi
         public DateTime ExpiresAt { get; set; }
     }
 
-    public class AuditLog {
+    public class AuditLog
+    {
         public DateTime Timestamp { get; set; }
         public string Level { get; set; }
         public string Message { get; set; }
@@ -162,8 +182,14 @@ public class PasswordlessApi
         public string UserId { get; set; }
     }
 
+    public class AliasPointer
+    {
+        public string UserId { get; set; }
+        public string Alias { get; set; }
+        public string Plaintext { get; set; }
+    }
     public class CredentialDescriptor
-    {     
+    {
         [JsonConverter(typeof(Base64UrlConverter))] public byte[] Id { get; set; }
     }
     public sealed class Base64UrlConverter : JsonConverter<byte[]>

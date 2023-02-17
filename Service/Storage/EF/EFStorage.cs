@@ -51,13 +51,10 @@ public class EFStorage : IStorage
         return db.AccountInfo.FirstOrDefaultAsync();
     }
 
-    public async Task<HashSet<string>> GetAliasesByUserId(byte[] userid)
+    public async Task<List<AliasPointer>> GetAliasesByUserId(string userid)
     {
-        var strId = Encoding.UTF8.GetString(userid);
-        var res = await db.Aliases.Where(a => a.UserId == strId).ToListAsync();
-
-        var rec = new HashSet<string>(res.Select(p => p.Alias));
-        return rec;
+        var res = await db.Aliases.Where(a => a.UserId == userid).ToListAsync();
+        return res;
     }
 
     public Task<ApiKeyDesc> GetApiKeyAsync(string apiKey)
@@ -121,11 +118,10 @@ public class EFStorage : IStorage
         await db.SaveChangesAsync();
     }
 
-    public async Task StoreAlias(byte[] userid, HashSet<string> aliases)
+    public async Task StoreAlias(string userid, Dictionary<string, string> aliases)
     {
-        var strUserId = Encoding.UTF8.GetString(userid);
-        var pointers = aliases.Select(a => new AliasPointer() { UserId = strUserId, Alias = a });
-        db.Aliases.RemoveRange(db.Aliases.Where(ap => ap.UserId == strUserId));
+        var pointers = aliases.Select(a => new AliasPointer() { UserId = userid, Alias = a.Key, Plaintext = a.Value });
+        db.Aliases.RemoveRange(db.Aliases.Where(ap => ap.UserId == userid));
         db.Aliases.AddRange(pointers);
         await db.SaveChangesAsync();
     }

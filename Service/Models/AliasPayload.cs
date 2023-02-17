@@ -8,5 +8,6 @@ namespace Service.Models
     {
         public string UserId { get; set; }
         public Aliases Aliases { get; set; }
+        public bool Hashing { get; set; } = true;
     }
 }
